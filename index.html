@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چشمک</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f4f4f9;
+            overflow: hidden;
+            font-family: Tahoma, sans-serif;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            transition: transform 0.1s ease-out;
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        p { color: #666; font-size: 1.2rem; }
+        .floating-logo {
+            position: absolute;
+            z-index: 9999;
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+        #face-logo { width: 100px; top: 20%; left: 20%; }
+        #text-logo { width: 180px; top: 60%; left: 60%; }
+        .sparkle {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #ff6b00;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            animation: sparkle-fade 1s forwards;
+            box-shadow: 0 0 10px #ff6b00;
+        }
+        @keyframes sparkle-fade {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="content" id="main-content">
+        <h1>به فروشگاه چشمک خوش آمدید!</h1>
+        <p>حرکت موس را دنبال کنید...</p>
+    </div>
+    <div id="face-logo" class="floating-logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" fill="#FF6B00" stroke="#000" stroke-width="4"/>
+            <ellipse cx="35" cy="40" rx="8" ry="12" fill="#000"/>
+            <path d="M 65 40 L 80 45 L 65 50" fill="#000" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 25 65 Q 50 85 75 65" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <div id="text-logo" class="floating-logo">
+        <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+            <text x="10" y="70" font-family="Tahoma, sans-serif" font-size="60" font-weight="bold" fill="#FF6B00">چشمک</text>
+            <circle cx="85" cy="20" r="5" fill="#000"/>
+            <circle cx="105" cy="20" r="5" fill="#000"/>
+        </svg>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const face = document.getElementById("face-logo");
+            const textLogo = document.getElementById("text-logo");
+            const content = document.getElementById("main-content");
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let time = 0;
+            document.addEventListener("mousemove", (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            function animate() {
+                time += 0.02;
+                let faceX = (window.innerWidth / 2) + Math.sin(time) * (window.innerWidth / 3);
+                let faceY = (window.innerHeight / 2) + Math.cos(time * 1.5) * (window.innerHeight / 3);
+                let dist = Math.hypot(mouseX - faceX, mouseY - faceY);
+                if (dist < 250) {
+                    let angle = Math.atan2(mouseY - faceY, mouseX - faceX);
+                    faceX -= Math.cos(angle) * 100;
+                    faceY -= Math.sin(angle) * 100;
+                }
+                face.style.transform = `translate(${faceX - 50}px, ${faceY - 50}px) rotate(${Math.sin(time * 2) * 15}deg)`;
+                textLogo.style.transform = `translate(${faceX - 150}px, ${faceY + 50}px) rotate(${Math.cos(time * 2) * 10}deg)`;
+                let moveX = (mouseX - window.innerWidth / 2) * 0.05;
+                let moveY = (mouseY - window.innerHeight / 2) * 0.05;
+                content.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                requestAnimationFrame(animate);
+            }
+            animate();
+            setInterval(() => {
+                const star = document.createElement("div");
+                star.classList.add("sparkle");
+                const rect = face.getBoundingClientRect();
+                star.style.left = (rect.left + Math.random() * rect.width) + "px";
+                star.style.top = (rect.top + Math.random() * rect.height) + "px";
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 1000);
+            }, 600);
+        });
+    </script>
+</body>
+</html>
